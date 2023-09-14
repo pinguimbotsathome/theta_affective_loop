@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Theta @Home</title>
+
+        <style>
+            body {
+                background-color: #030303;
+            }
+
+            #canva {
+                margin-top: 150px;
+                justify-content: center;
+                text-align: center;
+                bottom: 0;
+            }
+
+            img {
+                width: 55vh;
+                height: auto;
+            }
+
+            #view-fullscreen {
+                color: rgba(46, 46, 46, 0.541);
+                background-color: black;
+                border: none !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="canva"></div>
+
+        <!-- <button id="view-fullscreen">Fullscreen</button> -->
+    </body>
+
+    <!-- <script src="js/eventemitter2.min.js"></script> -->
+    <script src="js/roslib.min.js"></script>
+
+    <script>
+        var src = document.getElementById("canva");
+
+        setTimeout(function(){
+            // initialize a connection with a rosbridge server on port 9090
+            var ros = new ROSLIB.Ros({
+                url: 'ws://127.0.0.1:9090'
+            });
+
+            ros.on('connection', function() {
+                console.log('Connected to websocket server.');
+            });
+
+            ros.on('error', function(error) {
+                console.log('Error connecting to websocket server: ', error);
+            });
+
+            ros.on('close', function() {
+                console.log('Connection to websocket server closed.');
+            });
+
+            var cmdVel = new ROSLIB.Topic({
+                ros : ros,
+                name : '/hri/affective_loop',
+                messageType : 'std_msgs/String'
+            });
+
+            var echo = new ROSLIB.Message({
+                data : 'test'
+            });
+
+            cmdVel.publish(echo);
+
+            // function publishTopic(){
+                // Defines a topic listener
+            var listener = new ROSLIB.Topic({
+                ros : ros,
+                name : '/hri/affective_loop',
+                messageType : 'std_msgs/String'
+            });
+
+            listener.subscribe(function(message) {
+                console.log('Received message on ' + listener.name + ': ' + message.data);
+
+                if(message.data == 'excited'){
+                    clear();
+
+                    excited();
+                    // happy();
+                }else if(message.data == 'disappointed'){
+                    clear()
+                    disappointed();
+                // }else if(message.data == 'excited'){
+                //     excited();
+                }else if(message.data == 'happy'){
+                    clear();
+                    happy();
+                }else if(message.data == 'littleHappy'){
+                    clear();
+                    littleHappy();
+                }else if(message.data == 'neutral'){
+                    clear();
+                    neutral();
+                }else if(message.data == 'sad'){
+                    clear();
+                    sad();
+                }else if(message.data == 'scared'){
+                    clear();
+                    scared();
+                }else if(message.data == 'sleep'){
+                    clear();
+                    sleep();
+                }else if(message.data == 'sleeping'){
+                    clear();
+                    sleep2();
+                }
+                else if(message.data == 'dance'){
+                    clear();
+                    sleep2();
+                }
+
+                // listener.unsubscribe();
+            },);
+
+        }, 1000);
+       
+        // // ----------------------------------------------------------------------------------------------
+        // // ---------------------------------------------------------------------------------------------
+        // GAMBETA's Request Handler
+        // var i = 0;
+
+        // setInterval(function(){
+        //    console.log("Request " + i);
+        //    i++;
+        // }, 500);
+        // // ---------------------------------------------------------------------------------------------
+
+        // onload function to set up the environment as the page loads
+        window.onload = setTimeout(function(){ 
+            // initialize the theta gif
+            theta();
+     
+            // initialize the opacity function after 3500 milliseconds
+            setTimeout(opc, 3500);
+            // clean the screen after 4100 milliseconds
+            setTimeout(clear, 4100);
+            // reverse the opacity
+            setTimeout(ropc, 4101);
+
+            // initialize the loading gif after 4101 milliseconds
+            setTimeout(loading, 4101);
+
+            // initialize the opacity function after 9001 milliseconds
+            setTimeout(opc, 9001);
+            // clean the screen after 9101 milliseconds
+            setTimeout(clear, 9101);
+            // reverse the opacity
+            setTimeout(ropc, 9300);
+
+            // // inicialize the happy gif
+            setTimeout(happy, 9400);
+
+            // setTimeout(goDance, 20000);
+            // setTimeout(publishTopic, 12000);
+        }, 200);
+    
+        // console.log(listener.ros);
+        // console.log(listener.name);
+        // console.log(listener.messageType);
+
+        // Subscribe to ROS, retrieving the data from the topic previous published
+        // Change the runtime logic
+        
+        // setTimeout(function(){
+        //     listener.subscribe(function(message) {
+        //         console.log('Received message on ' + listener.name + ': ' + message.data);
+
+        //         if(message.data == 'Hello'){
+        //             happy();
+        //         }else if(message.data == 'disappointed'){
+        //             disappointed();
+        //         }else if(message.data == 'excited'){
+        //             excited();
+        //         }else if(message.data == 'happy'){
+        //             happy();
+        //         }else if(message.data == 'littleHappy'){
+        //             littleHappy();
+        //         }else if(message.data == 'neutral'){
+        //             neutral();
+        //         }else if(message.data == 'sad'){
+        //             sad();
+        //         }else if(message.data == 'scared'){
+        //             scared();
+        //         }else if(message.data == 'sleep'){
+        //             sleep();
+        //         }else if(message.data == 'sleeping'){
+        //             sleep2();
+        //         }
+
+        //         // listener.unsubscribe();
+        //     },); 
+        // }, 5000);
+
+        
+
+        // }
+
+        // publishTopic();
+
+        // function to handle the DOM opacity
+        function opc(){
+            var op = 1;
+
+            var timer = setInterval(function (){
+                if(op <= 0.1){
+                    clearInterval(timer);
+                    src.style.opacity = 'none';
+                }
+
+                src.style.opacity = op;
+                src.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op -= op * 0.1;
+            }, 20);
+        }
+
+        // function to handle the DOM reverse opacity
+        function ropc(){
+            var op = 0.1;
+            
+            src.style.display = 'block';
+            var timer = setInterval(function () {
+                if (op >= 1){
+                    clearInterval(timer);
+                }
+                src.style.opacity = op;
+                src.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op += op * 0.1;
+            }, 10);
+        }
+
+        // function to clear the DOM opacity
+        function copc(){
+            src.style.opacity = "1";
+        }
+
+        // theta instruction
+        function theta(){
+            document.getElementById("canva").innerHTML = "";
+            
+            var img = document.createElement("img");
+            img.src = "gif/theta.gif";
+            src.appendChild(img);
+        }
+        
+        // instruction to clear the DOM
+        function clear(){
+            document.getElementById("canva").innerHTML = "";
+        }
+
+        // goDance instruction
+        function goDance(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/dance.gif';
+            src.appendChild(img);
+        }
+
+        // disappointed instruction
+        function disappointed(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = "gif/disappointed.gif";
+            src.appendChild(img);
+        }
+
+        // excited instruction
+        function excited(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = "gif/excited.gif";
+            src.appendChild(img);
+        }
+        
+        // happy instruction
+        function happy(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/happy.gif';
+            src.appendChild(img);
+        }
+
+        // little happy instruction
+        function littleHappy(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/littleHappy.gif';
+            src.appendChild(img);
+        }
+
+        // loading instruction
+        function loading(){
+            copc();
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/loading.gif';
+            src.appendChild(img);
+        }
+
+        // neutral instruction
+        function neutral(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/neutral.gif';
+            src.appendChild(img);
+        }
+
+        // don't understand instruction
+        function sad(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/sad.gif';
+            src.appendChild(img);
+        }
+
+        // scared instruction
+        function scared(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = 'gif/scared.gif';
+            src.appendChild(img);
+        }
+
+        // sleep instruction
+        function sleep(){
+            document.getElementById("canva").innerHTML = "";
+            
+            var img = document.createElement("img");
+            img.src = "gif/sleep.gif";
+            src.appendChild(img);
+        }
+
+        // sleeping2 instruction
+        function sleep2(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = "gif/sleeping.gif";
+            src.appendChild(img);
+        }
+
+        // ---------------------------------------------------------------------------------------------------
+        var viewFullScreen = document.getElementById("view-fullscreen");
+        
+        if (viewFullScreen) {
+            viewFullScreen.addEventListener("click", function() {
+                var isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+                    (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+                    (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+                    (document.msFullscreenElement && document.msFullscreenElement !== null);
+
+                var docElm = document.documentElement;
+                if (!isInFullScreen) {
+                    if (docElm.requestFullscreen) {
+                        docElm.requestFullscreen();
+                    } else if (docElm.mozRequestFullScreen) {
+                        docElm.mozRequestFullScreen();
+                    } else if (docElm.webkitRequestFullScreen) {
+                        docElm.webkitRequestFullScreen();
+                    } else if (docElm.msRequestFullscreen) {
+                        docElm.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            })
+        }
+    </script>
+</html>
