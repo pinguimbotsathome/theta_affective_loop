@@ -120,6 +120,14 @@
                     clear();
                     goDance();
                 }
+                else if(message.data == 'follow'){
+                    clear();
+                    follow();
+                }
+                else if(message.data == 'confirmation'){
+                    clear();
+                    confirmation();
+                }
 
                 // listener.unsubscribe();
             },);
@@ -359,6 +367,22 @@
             src.appendChild(img);
         }
 
+        function follow(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = "gif/follow.gif";
+            src.appendChild(img);
+        }
+
+        function confirmation(){
+            document.getElementById("canva").innerHTML = "";
+
+            var img = document.createElement("img");
+            img.src = "gif/confirmation.gif";
+            src.appendChild(img);
+        }
+        
         // ---------------------------------------------------------------------------------------------------
         var viewFullScreen = document.getElementById("view-fullscreen");
         
